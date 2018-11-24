@@ -296,6 +296,12 @@ public class CachedAppAssetLoader {
         });
     }
 
+    public Bitmap getImage(NvApp app)
+    {
+        LoaderTuple tuple = new LoaderTuple(computer, app);
+        return diskLoader.loadBitmapFromCache(tuple,(int) scalingDivider);
+    }
+
     public boolean populateImageView(NvApp app, ImageView imgView, ProgressBar prgView) {
         LoaderTuple tuple = new LoaderTuple(computer, app);
 

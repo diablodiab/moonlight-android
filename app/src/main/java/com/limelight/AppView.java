@@ -3,6 +3,7 @@ package com.limelight;
 import java.io.StringReader;
 import java.util.List;
 import java.util.UUID;
+import java.io.*;
 
 import com.limelight.computers.ComputerManagerListener;
 import com.limelight.computers.ComputerManagerService;
@@ -44,6 +45,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.graphics.Bitmap;
 
 public class AppView extends Activity implements AdapterFragmentCallbacks {
     private AppGridAdapter appGridAdapter;
@@ -299,6 +301,41 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Create launcher files
+        for(int i=0; i<appGridAdapter.getCount(); i++)
+        {
+            AppObject nApp = (AppObject) appGridAdapter.getItem(i);
+            String appName = nApp.app.getAppName();
+            int appId = nApp.app.getAppId();
+            Bitmap img = appGridAdapter.getLoader().getImage(nApp.app);
+
+            File gamefile = new File(this.getExternalFilesDir("Games"), appName.replaceAll("[:/™]","") + ".gamestream");
+            try {
+                BufferedWriter out = new BufferedWriter(new FileWriter(gamefile.getAbsolutePath(), false));
+                out.write(appName + "\n");
+                out.write(appId + "\n");
+                out.write(computer.localAddress +"\n");
+                out.write(managerBinder.getUniqueId() + "\n");
+                out.write(computer.uuid.toString() + "\n");
+                out.write(computer.name + "\n");
+                out.write(computer.macAddress + "\n");
+                out.close();
+            } catch (Exception e) {
+                Toast.makeText(AppView.this, "Problem saving game files data...", Toast.LENGTH_SHORT).show();
+                // Log.e(TAG, "Error opening Log.", e);
+            }
+            File imagefile = new File(this.getExternalFilesDir("Games"), appName.replaceAll("[:/™]","") + ".jpg");
+            try {
+                FileOutputStream out = new FileOutputStream(imagefile);
+                img.compress(Bitmap.CompressFormat.JPEG, 85, out);
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                Toast.makeText(AppView.this, "Problem image files...", Toast.LENGTH_SHORT).show();
+            }
+        }
+        Toast.makeText(AppView.this, "Saved gamefiles and images to data folder...", Toast.LENGTH_SHORT).show();
 
         SpinnerDialog.closeDialogs(this);
         Dialog.closeDialogs();

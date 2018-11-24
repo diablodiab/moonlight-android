@@ -86,6 +86,11 @@ public class AppGridAdapter extends GenericGridAdapter<AppView.AppObject> {
         return true;
     }
 
+    public CachedAppAssetLoader getLoader()
+    {
+        return loader;
+    }
+
     @Override
     public boolean populateTextView(TextView txtView, AppView.AppObject obj) {
         // Select the text view so it starts marquee mode
